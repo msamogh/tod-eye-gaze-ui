@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Include bootstrap CSS-->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+        integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
+        integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+
+
+    <title>Annotate Dialogues</title>
+</head>
+<script>
+</script>
+<link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" />
+<style>
+    .speaker {
+        font-weight: bold;
+    }
+
+    .dialogue {
+        font-size: 12pt;
+    }
+
+    .utterance {
+        max-width: 100%;
+        text-overflow: wrap;
+    }
+    .utterance-user {
+        text-align: right;
+        margin-left: 100px;
+    }
+    .utterance-system {
+        text-align: left;
+        margin-right: 100px;
+    }
+
+    .speaker {
+        max-width: 100%;
+        text-overflow: wrap;
+    }
+    .speaker-user {
+        text-align: right;
+    }
+    .speaker-system {
+        text-align: left;
+    }
+    label {
+        color: purple;
+    }
+    table{
+        width: 80%;
+        margin: auto auto;
+    }
+    .left-td {
+
+    }
+    .right-td {
+        text-align: right;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <div class="sticky-top">
+            <div class="controls">
+                <button class="btn next">Next</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="md-col-12">
+                <div class="dialogue">
+                    <table>
+                        {% for turn in dialogue.turns %}
+                        <tr>
+                            <td class="left-td">
+                                {% if turn.speaker == "system" %}
+                                    <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
+                                    <div class="utterance utterance-{{turn.speaker}}">{{ turn.text }}</div>    
+                                {% endif %}
+                            </td>
+                            <td class="right-td">
+                                {% if turn.speaker == "user" %}
+                                    <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
+                                    <div class="utterance utterance-{{turn.speaker}}">{{ turn.text }}</div>    
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    <!-- <ul class="turns">
+                        {% for turn in dialogue.turns %}
+                        <li class="turn turn-{{turn.speaker}}">
+                            <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div><br />
+                            <div class="utterance utterance-{{turn.speaker}}">{{ turn.text }}</div>
+                        </li>
+                        {% endfor %}
+                        <form>
+                            <div class="form-group">
+                                <label for="response">Response</label>
+                                <input type="text" class="form-control" id="response" placeholder="Enter suitable response">
+                                <small id="responseHelp" class="form-text text-muted">Try to match the dialogue's flow as much
+                                    as possible.
+                                </small>
+                            </div>
+                        </form>
+                    </ul> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
