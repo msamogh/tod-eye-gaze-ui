@@ -14,58 +14,136 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
         integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" />
+
+    <!-- Include jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <style>
+        .speaker {
+            font-weight: bold;
+        }
+
+        .dialogue {
+            font-size: 12pt;
+        }
+
+        .utterance {
+            max-width: 100%;
+            text-overflow: wrap;
+        }
+
+        .utterance-user {
+            text-align: right;
+            margin-left: 100px;
+        }
+
+        .utterance-system {
+            text-align: left;
+            margin-right: 100px;
+        }
+
+        .speaker {
+            max-width: 100%;
+            text-overflow: wrap;
+        }
+
+        .speaker-user {
+            text-align: right;
+        }
+
+        .speaker-system {
+            text-align: left;
+        }
+
+        label {
+            color: purple;
+        }
+
+        table {
+            width: 80%;
+            margin: auto auto;
+        }
+
+        .left-td {}
+
+        .right-td {
+            text-align: right;
+        }
+    </style>
+
+    <script>
+        closestTurn = (bounds, gazeX, gazeY) => {
+            let closest = null;
+            let closestDist = null;
+            console.log(bounds)
+            console.log(gazeX)
+            console.log(gazeY)
+            for (const [i, bound] of Object.entries(bounds)) {
+                console.log("Checking turn " + i)
+                let dist = Math.sqrt(
+                    Math.pow((bound.top + bound.bottom) / 2 - gazeX, 2) + Math.pow((bound.right - bound.left) / 2 - gazeY, 2)
+                );
+                console.log("dist: " + dist);
+                if (closestDist == null || dist < closestDist) {
+                    closest = i;
+                    closestDist = dist;
+                }
+            }
+            return closest;
+        }
+
+        $(document).ready(function () {
+            const bounds = {};
+            setInterval(function () {
+                $("div.utterance").each((index, element) => {
+                    bounds[index] = {
+                        top: $(element).offset().top + window.screenY,
+                        bottom: $(element).offset().top + window.screenY + $(element).height(),
+                        left: $(element).offset().left + window.screenX,
+                        right: $(element).offset().left + window.screenX + $(element).width()
+                    }
+                })
+                $.ajax({
+                    type: "POST",
+                    url: "/latest_gaze_coords",
+                    success: function (response) {
+                        let gazeX = response.x;
+                        let gazeY = response.y;
+                        let closestTurnIdx = closestTurn(bounds, gazeX, gazeY);
+                        $("div.utterance").each((index, element) => {
+                            if (index == closestTurnIdx) {
+                                $(element).css("background-color", "yellow");
+                            } else {
+                                $(element).css("background-color", "white");
+                            }
+                        })
+                        console.log("Logging")
+                        console.log(gazeX)
+                        console.log(gazeY)
+                        console.log(closestTurnIdx)
+                        console.log("\n")
+                        let data = {
+                            "closestTurn": closestTurnIdx,
+                            "timestamp": new Date().getTime()
+                        }
+                        console.log(data)
+                        $.ajax({
+                            type: "POST",
+                            url: "/telemetry",
+                            data: data,
+                            success: function (response) {
+                                console.log(response)
+                            }
+                        })
+                    }
+                })
+            }, 100)
+        })
+    </script>
 
     <title>Annotate Dialogues</title>
 </head>
-<script>
-</script>
-<link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" />
-<style>
-    .speaker {
-        font-weight: bold;
-    }
-
-    .dialogue {
-        font-size: 12pt;
-    }
-
-    .utterance {
-        max-width: 100%;
-        text-overflow: wrap;
-    }
-    .utterance-user {
-        text-align: right;
-        margin-left: 100px;
-    }
-    .utterance-system {
-        text-align: left;
-        margin-right: 100px;
-    }
-
-    .speaker {
-        max-width: 100%;
-        text-overflow: wrap;
-    }
-    .speaker-user {
-        text-align: right;
-    }
-    .speaker-system {
-        text-align: left;
-    }
-    label {
-        color: purple;
-    }
-    table{
-        width: 80%;
-        margin: auto auto;
-    }
-    .left-td {
-
-    }
-    .right-td {
-        text-align: right;
-    }
-</style>
 
 <body>
     <div class="container">
@@ -83,14 +161,16 @@
                         <tr>
                             <td class="left-td">
                                 {% if turn.speaker == "system" %}
-                                    <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
-                                    <div class="utterance utterance-{{turn.speaker}}">{{ turn.text }}</div>    
+                                <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
+                                <div id="turn-{{loop.index0}}" class="utterance utterance-{{turn.speaker}}">{{ turn.text
+                                    }}</div>
                                 {% endif %}
                             </td>
                             <td class="right-td">
                                 {% if turn.speaker == "user" %}
-                                    <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
-                                    <div class="utterance utterance-{{turn.speaker}}">{{ turn.text }}</div>    
+                                <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
+                                <div id="turn-{{loop.index0}}" class="utterance utterance-{{turn.speaker}}">{{ turn.text
+                                    }}</div>
                                 {% endif %}
                             </td>
                         </tr>
