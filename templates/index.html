@@ -7,12 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Include bootstrap CSS-->
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
-        integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 
     <!-- Optional theme -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
-        integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" />
 
@@ -23,52 +21,46 @@
         .speaker {
             font-weight: bold;
         }
-
+        
         .dialogue {
             font-size: 12pt;
         }
-
-        .utterance {
-            max-width: 100%;
-            text-overflow: wrap;
-        }
-
+        
         .utterance-user {
             text-align: right;
             margin-left: 100px;
         }
-
+        
         .utterance-system {
             text-align: left;
             margin-right: 100px;
         }
-
+        
         .speaker {
             max-width: 100%;
             text-overflow: wrap;
         }
-
+        
         .speaker-user {
             text-align: right;
         }
-
+        
         .speaker-system {
             text-align: left;
         }
-
+        
         label {
             color: purple;
         }
-
+        
+        tr {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        
         table {
             width: 80%;
             margin: auto auto;
-        }
-
-        .left-td {}
-
-        .right-td {
-            text-align: right;
         }
     </style>
 
@@ -76,15 +68,15 @@
         closestTurn = (bounds, gazeX, gazeY) => {
             let closest = null;
             let closestDist = null;
-            console.log(bounds)
-            console.log(gazeX)
-            console.log(gazeY)
+            // console.log(bounds)
+            // console.log(gazeX)
+            // console.log(gazeY)
             for (const [i, bound] of Object.entries(bounds)) {
-                console.log("Checking turn " + i)
+                // console.log("Checking turn " + i)
                 let dist = Math.sqrt(
                     Math.pow((bound.top + bound.bottom) / 2 - gazeX, 2) + Math.pow((bound.right - bound.left) / 2 - gazeY, 2)
                 );
-                console.log("dist: " + dist);
+                // console.log("dist: " + dist);
                 if (closestDist == null || dist < closestDist) {
                     closest = i;
                     closestDist = dist;
@@ -93,9 +85,9 @@
             return closest;
         }
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             const bounds = {};
-            setInterval(function () {
+            setInterval(function() {
                 $("div.utterance").each((index, element) => {
                     bounds[index] = {
                         top: $(element).offset().top + window.screenY,
@@ -107,33 +99,33 @@
                 $.ajax({
                     type: "POST",
                     url: "/latest_gaze_coords",
-                    success: function (response) {
+                    success: function(response) {
                         let gazeX = response.x;
                         let gazeY = response.y;
                         let closestTurnIdx = closestTurn(bounds, gazeX, gazeY);
                         $("div.utterance").each((index, element) => {
-                            if (index == closestTurnIdx) {
-                                $(element).css("background-color", "yellow");
-                            } else {
-                                $(element).css("background-color", "white");
-                            }
-                        })
-                        console.log("Logging")
-                        console.log(gazeX)
-                        console.log(gazeY)
-                        console.log(closestTurnIdx)
-                        console.log("\n")
+                                if (index == closestTurnIdx) {
+                                    $(element).css("background-color", "yellow");
+                                } else {
+                                    $(element).css("background-color", "white");
+                                }
+                            })
+                            // console.log("Logging")
+                            // console.log(gazeX)
+                            // console.log(gazeY)
+                            // console.log(closestTurnIdx)
+                            // console.log("\n")
                         let data = {
-                            "closestTurn": closestTurnIdx,
-                            "timestamp": new Date().getTime()
-                        }
-                        console.log(data)
+                                "closestTurn": closestTurnIdx,
+                                "timestamp": new Date().getTime()
+                            }
+                            // console.log(data)
                         $.ajax({
                             type: "POST",
                             url: "/telemetry",
                             data: data,
-                            success: function (response) {
-                                console.log(response)
+                            success: function(response) {
+                                // console.log(response)
                             }
                         })
                     }
@@ -146,37 +138,33 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="sticky-top">
-            <div class="controls">
-                <button class="btn next">Next</button>
-            </div>
-        </div>
-
+    <div class="container-fluid">
         <div class="row">
-            <div class="md-col-12">
-                <div class="dialogue">
-                    <table>
-                        {% for turn in dialogue.turns %}
-                        <tr>
-                            <td class="left-td">
-                                {% if turn.speaker == "system" %}
-                                <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
-                                <div id="turn-{{loop.index0}}" class="utterance utterance-{{turn.speaker}}">{{ turn.text
-                                    }}</div>
-                                {% endif %}
-                            </td>
-                            <td class="right-td">
-                                {% if turn.speaker == "user" %}
-                                <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
-                                <div id="turn-{{loop.index0}}" class="utterance utterance-{{turn.speaker}}">{{ turn.text
-                                    }}</div>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                    <!-- <ul class="turns">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="dialogue">
+                            <table>
+                                {% for turn in dialogue.turns %}
+                                <tr>
+                                    <td class="left-td">
+                                        {% if turn.speaker == "system" %}
+                                        <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
+                                        <div id="turn-{{loop.index0}}" class="utterance utterance-{{turn.speaker}}">{{ turn.text }}
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="right-td">
+                                        {% if turn.speaker == "user" %}
+                                        <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
+                                        <div id="turn-{{loop.index0}}" class="utterance utterance-{{turn.speaker}}">{{ turn.text }}
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                            <!-- <ul class="turns">
                         {% for turn in dialogue.turns %}
                         <li class="turn turn-{{turn.speaker}}">
                             <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div><br />
@@ -193,7 +181,19 @@
                             </div>
                         </form>
                     </ul> -->
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="col-md-2"></div>
+            <div class="col-md-2" style="margin-right: 29px; float: right;">
+                <form>
+                    {% for slot in slots %}
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="{{ slot.slot_name }}">
+                    </div>
+                    {% endfor %}
+                </form>
             </div>
         </div>
     </div>

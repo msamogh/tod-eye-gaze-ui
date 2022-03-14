@@ -1,4 +1,5 @@
 from pathlib import Path
+from pprint import pprint
 import json
 import os
 import random
@@ -6,26 +7,33 @@ import random
 import click
 from flask import Flask, render_template, session, jsonify, request
 
-from data_util import load_multiwoz, load_star
+from data_util import (
+    Dialogue,
+    load_multiwoz,
+    load_star,
+    load_multiwoz_ontology,
+    load_star_ontology,
+)
 
 
 DIALOGUE_IDX_KEY = "DIALOGUE_IDX"
 GAZE_STREAM_PATH = None
+
+MULTIWOZ = load_multiwoz()
+STAR = load_star()
+
+ONTOLOGIES = {"STAR": load_star_ontology(), "MULTIWOZ": load_multiwoz_ontology()}
 
 
 app = Flask(__name__)
 app.secret_key = "TERRRIGDENOINDEdfnfw3"
 
 
-MULTIWOZ = load_multiwoz()
-STAR = load_star()
-
-
-def next_dialogue():
+def next_dialogue() -> Dialogue:
     if not session.get(DIALOGUE_IDX_KEY):
         session[DIALOGUE_IDX_KEY] = 0
     # Randomly decide between MultiWOZ and STAR
-    if True or random.random() < 0.5:
+    if random.random() < 0.5:
         dialogue = random.choice(MULTIWOZ)
     else:
         dialogue = random.choice(STAR)
@@ -36,7 +44,12 @@ def next_dialogue():
 @app.route("/")
 def index():
     dialogue = next_dialogue()
-    return render_template("index.html", dialogue=dialogue)
+    pprint(dialogue)
+    return render_template(
+        "index.html",
+        dialogue=dialogue,
+        slots=ONTOLOGIES[dialogue.dataset][dialogue.domain],
+    )
 
 
 def get_last_line(path):
@@ -57,7 +70,7 @@ def latest_gaze_coords():
         try:
             last_line = get_last_line(GAZE_STREAM_PATH)
             latest_log = json.loads(last_line)["values"]["frame"]["avg"]
-            print(f"Latest log: {latest_log}")
+            # print(f"Latest log: {latest_log}")
             break
         except Exception as e:
             print(e)
@@ -67,11 +80,15 @@ def latest_gaze_coords():
 
 @app.route("/telemetry", methods=["POST"])
 def telemetry():
-    print("Telemetry received")
-    print(request.data)
-    data = json.loads(request.data)
-    bounds = data["bounds"]
-    time = float(data["timestamp"])
+    # print("Telemetry received")
+    # print(request.data)
+    try:
+        data = json.loads(request.data)
+        bounds = data["bounds"]
+        time = float(data["timestamp"])
+    except:
+        pass
+    return "success"
 
 
 @click.command()
