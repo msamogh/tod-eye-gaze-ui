@@ -1,6 +1,6 @@
 /* Space out content a bit */
 
-body {
+.container-fluid {
     padding-top: 20px;
 }
 
