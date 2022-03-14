@@ -18,6 +18,10 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
     <style>
+        div.utterance {
+            border: 2px solid red;
+        }
+        
         .speaker {
             font-weight: bold;
         }
@@ -70,56 +74,50 @@
     </style>
 
     <script>
-        closestTurn = (bounds, gazeX, gazeY) => {
+        const closestTurn = (bounds, gazeX, gazeY) => {
             let closest = null;
             let closestDist = null;
-            // console.log(bounds)
-            // console.log(gazeX)
-            // console.log(gazeY)
             for (const [i, bound] of Object.entries(bounds)) {
-                // console.log("Checking turn " + i)
-                let dist = Math.sqrt(
-                    Math.pow((bound.top + bound.bottom) / 2 - gazeX, 2) + Math.pow((bound.right - bound.left) / 2 - gazeY, 2)
-                );
-                // console.log("dist: " + dist);
+                const dist = Math.hypot(gazeX - (bound.left + bound.right) / 2, gazeY - (bound.top + bound.bottom) / 2);
+                // console.log("Distance with " + i + " is " + dist)
                 if (closestDist == null || dist < closestDist) {
                     closest = i;
                     closestDist = dist;
                 }
             }
+            console.log("closest turn: " + closest + "; least distance: " + closestDist)
             return closest;
         }
 
         $(document).ready(function() {
-            const bounds = {};
+            bounds = {};
+            $("div.utterance").each((index, element) => {
+                bounds[index] = {
+                    top: $(element).offset().top + window.screenY,
+                    bottom: $(element).offset().top + window.screenY + $(element).height(),
+                    left: $(element).offset().left + window.screenX,
+                    right: $(element).offset().left + window.screenX + $(element).width()
+                }
+                $(element).siblings(".speaker").html(index + "");
+            })
             setInterval(function() {
-                $("div.utterance").each((index, element) => {
-                    bounds[index] = {
-                        top: $(element).offset().top + window.screenY,
-                        bottom: $(element).offset().top + window.screenY + $(element).height(),
-                        left: $(element).offset().left + window.screenX,
-                        right: $(element).offset().left + window.screenX + $(element).width()
-                    }
-                })
                 $.ajax({
                     type: "POST",
                     url: "/latest_gaze_coords",
                     success: function(response) {
-                        let gazeX = response.x;
-                        let gazeY = response.y;
+                        let gazeX = response.coords.x;
+                        let gazeY = response.coords.y;
+                        // let turn = 0
+                        // let gazeX = (bounds[turn].left + bounds[turn].right) / 2;
+                        // let gazeY = (bounds[turn].top + bounds[turn].bottom) / 2;
                         let closestTurnIdx = closestTurn(bounds, gazeX, gazeY);
                         $("div.utterance").each((index, element) => {
-                                if (index == closestTurnIdx) {
-                                    $(element).css("background-color", "yellow");
-                                } else {
-                                    $(element).css("background-color", "white");
-                                }
-                            })
-                            // console.log("Logging")
-                            // console.log(gazeX)
-                            // console.log(gazeY)
-                            // console.log(closestTurnIdx)
-                            // console.log("\n")
+                            if (index == closestTurnIdx) {
+                                $(element).css("background-color", "yellow");
+                            } else {
+                                $(element).css("background-color", "white");
+                            }
+                        })
                         let data = {
                                 "closestTurn": closestTurnIdx,
                                 "timestamp": new Date().getTime()
@@ -135,7 +133,7 @@
                         })
                     }
                 })
-            }, 100)
+            }, 15)
         })
     </script>
 
@@ -144,7 +142,7 @@
 
 <body>
     <nav class="navbar navbar-light bg-light">
-        <span class="navbar-brand mb-0 h1">Navbar</span>
+        <span class="navbar-brand mb-0 h1">Annotate Dialogue</span>
     </nav>
     <div class="container-fluid">
         <div class="row">
@@ -172,23 +170,6 @@
                                 </tr>
                                 {% endfor %}
                             </table>
-                            <!-- <ul class="turns">
-                        {% for turn in dialogue.turns %}
-                        <li class="turn turn-{{turn.speaker}}">
-                            <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div><br />
-                            <div class="utterance utterance-{{turn.speaker}}">{{ turn.text }}</div>
-                        </li>
-                        {% endfor %}
-                        <form>
-                            <div class="form-group">
-                                <label for="response">Response</label>
-                                <input type="text" class="form-control" id="response" placeholder="Enter suitable response">
-                                <small id="responseHelp" class="form-text text-muted">Try to match the dialogue's flow as much
-                                    as possible.
-                                </small>
-                            </div>
-                        </form>
-                    </ul> -->
                         </div>
                     </div>
                 </div>
