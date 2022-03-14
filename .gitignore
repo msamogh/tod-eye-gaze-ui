@@ -1,0 +1,8 @@
+MULTIWOZ2.4.zip
+*.pyc
+templates/form.html
+irb/Sample Transcript 1.pdf
+eye-tracking-experiments/amogh-trial-1.js
+datasets/MULTIWOZ2.4/MULTIWOZ2.4/*.json
+*.code-workspace
+settings.json
