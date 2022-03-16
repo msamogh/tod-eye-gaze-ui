@@ -1,4 +1,4 @@
-# Analyzing the Typical Trajectories of Reading an Academic Paper
+# Analyzing Eye-Gaze Trajectory of Task-Oriented Dialogue Transcripts
 
 ![](assets/Animation2.gif)
 
