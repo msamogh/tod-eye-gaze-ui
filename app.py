@@ -137,6 +137,7 @@ def latest_gaze_coords():
                     return jsonify(response)
         except Exception as e:
             print(e)
+            print(line)
             continue
 
 

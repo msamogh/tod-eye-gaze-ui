@@ -20,6 +20,8 @@
     <style>
         div.utterance {
             border: 2px solid red;
+            margin-top: 10px;
+            margin-bottom: 10px;
         }
         
         .speaker {
@@ -58,8 +60,8 @@
         }
         
         tr {
-            margin-top: 5px;
-            margin-bottom: 5px;
+            margin-top: 20px;
+            margin-bottom: 20px;
         }
         
         table {
@@ -88,7 +90,7 @@
                     closestDist = dist;
                 }
             }
-            console.log("closest turn: " + closest + "; least distance: " + closestDist)
+            // console.log("closest turn: " + closest + "; least distance: " + closestDist)
             return closest;
         }
 
@@ -130,17 +132,17 @@
                                 "timestamp": new Date().getTime()
                             }
                             // console.log(data)
-                        $.ajax({
-                            type: "POST",
-                            url: "/telemetry",
-                            data: data,
-                            success: function(response) {
-                                // console.log(response)
-                            }
-                        })
+                            // $.ajax({
+                            //     type: "POST",
+                            //     url: "/telemetry",
+                            //     data: data,
+                            //     success: function(response) {
+                            //         // console.log(response)
+                            //     }
+                            // })
                     }
                 })
-            }, 15)
+            }, 100)
 
             $("#submit").click(function() {
                 let data = {
