@@ -14,6 +14,7 @@ from data_util import (
     load_multiwoz_ontology,
     load_star_ontology,
 )
+from constants import NAME_EMAIL_FOLDER, GAZE_PATH_FOLDER
 
 
 DIALOGUE_IDX_KEY = "DIALOGUE_IDX"
@@ -141,16 +142,13 @@ def latest_gaze_coords():
             continue
 
 
-@app.route("/telemetry", methods=["POST"])
+@app.route("/submit", methods=["POST"])
 def telemetry():
-    # print("Telemetry received")
-    # print(request.data)
-    try:
-        data = json.loads(request.data)
-        bounds = data["bounds"]
-        time = float(data["timestamp"])
-    except:
-        pass
+    data = json.loads(request.data)
+    if not os.path.exists(NAME_EMAIL_FOLDER):
+        os.mkdir(NAME_EMAIL_FOLDER)
+    with open(f"{GAZE_PATH_FOLDER}/{time}.json", "w") as f:
+        json.dump(data, f)
     return "success"
 
 

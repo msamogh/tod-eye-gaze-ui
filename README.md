@@ -1,5 +1,7 @@
 # Analyzing the Typical Trajectories of Reading an Academic Paper
 
+![](assets/Animation2.gif)
+
 ## Setup
 ### Installing Poetry
 
