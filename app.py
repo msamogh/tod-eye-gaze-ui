@@ -2,6 +2,7 @@ from pathlib import Path
 from pprint import pprint
 import json
 import os
+import time
 import random
 
 import click
@@ -54,12 +55,12 @@ def index():
         session["email"] = request.form["email_address"]
         session["name"] = request.form["name"]
         try:
-            if not os.path.exists("name-emails"):
-                os.mkdir("name-emails")
-            with open(f"name-emails/{time.time()}.json", "w") as f:
+            if not os.path.exists(NAME_EMAIL_FOLDER):
+                os.mkdir(NAME_EMAIL_FOLDER)
+            with open(f"{NAME_EMAIL_FOLDER}/{time.time()}.json", "w") as f:
                 json.dump(request.form, f)
-        except:
-            pass
+        except Exception as e:
+            print(f"Exception while saving user information: {e}")
         return redirect(url_for("activity"))
     return render_template("index.html")
 
@@ -152,8 +153,8 @@ def latest_gaze_coords():
 @app.route("/submit", methods=["POST"])
 def telemetry():
     data = json.loads(request.data)
-    if not os.path.exists(NAME_EMAIL_FOLDER):
-        os.mkdir(NAME_EMAIL_FOLDER)
+    if not os.path.exists(GAZE_PATH_FOLDER):
+        os.mkdir(GAZE_PATH_FOLDER)
     with open(f"{GAZE_PATH_FOLDER}/{time}.json", "w") as f:
         json.dump(data, f)
     return "success"
