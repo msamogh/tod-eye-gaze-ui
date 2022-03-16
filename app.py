@@ -5,7 +5,7 @@ import os
 import random
 
 import click
-from flask import Flask, render_template, session, jsonify, request
+from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 
 from data_util import (
     Dialogue,
@@ -41,12 +41,31 @@ def next_dialogue() -> Dialogue:
     return dialogue
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
+    if request.method == "POST":
+        # Save the form data to the session object
+        session["email"] = request.form["email_address"]
+        session["name"] = request.form["name"]
+        try:
+            if not os.path.exists("name-emails"):
+                os.mkdir("name-emails")
+            with open(f"name-emails/{time.time()}.json", "w") as f:
+                json.dump(request.form, f)
+        except:
+            pass
+        return redirect(url_for("activity"))
+    return render_template("index.html")
+
+
+@app.route("/activity")
+def activity():
+    if "email" not in session:
+        return redirect("/")
     dialogue = next_dialogue()
     pprint(dialogue)
     return render_template(
-        "index.html",
+        "activity.html",
         dialogue=dialogue,
         slots=ONTOLOGIES[dialogue.dataset][dialogue.domain],
     )
@@ -111,10 +130,10 @@ def latest_gaze_coords():
                 if line.strip() == "":
                     continue
                 line = json.loads(line)
-                print(line)
+                # print(line)
                 if line["category"] == "tracker":
                     response = {"coords": line["values"]["frame"]["avg"]}
-                    print(response)
+                    # print(response)
                     return jsonify(response)
         except Exception as e:
             print(e)

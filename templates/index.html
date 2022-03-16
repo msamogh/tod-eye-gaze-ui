@@ -1,188 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Include bootstrap CSS-->
+    <title>Login</title>
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
-
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" />
-
-    <!-- Include jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
-    <style>
-        div.utterance {
-            border: 2px solid red;
-        }
-        
-        .speaker {
-            font-weight: bold;
-        }
-        
-        .dialogue {
-            font-size: 12pt;
-        }
-        
-        .utterance-user {
-            text-align: right;
-            margin-left: 100px;
-        }
-        
-        .utterance-system {
-            text-align: left;
-            margin-right: 100px;
-        }
-        
-        .speaker {
-            max-width: 100%;
-            text-overflow: wrap;
-        }
-        
-        .speaker-user {
-            text-align: right;
-        }
-        
-        .speaker-system {
-            text-align: left;
-        }
-        
-        label {
-            color: purple;
-        }
-        
-        tr {
-            margin-top: 5px;
-            margin-bottom: 5px;
-        }
-        
-        table {
-            width: 80%;
-            margin: auto auto;
-            margin-bottom: 30px;
-        }
-        
-        nav {
-            background-color: antiquewhite;
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style type='text/css'>
+        form {
+            margin-top: 20px;
         }
     </style>
-
-    <script>
-        const closestTurn = (bounds, gazeX, gazeY) => {
-            let closest = null;
-            let closestDist = null;
-            for (const [i, bound] of Object.entries(bounds)) {
-                const dist = Math.hypot(gazeX - (bound.left + bound.right) / 2, gazeY - (bound.top + bound.bottom) / 2);
-                // console.log("Distance with " + i + " is " + dist)
-                if (closestDist == null || dist < closestDist) {
-                    closest = i;
-                    closestDist = dist;
-                }
-            }
-            console.log("closest turn: " + closest + "; least distance: " + closestDist)
-            return closest;
-        }
-
-        $(document).ready(function() {
-            bounds = {};
-            $("div.utterance").each((index, element) => {
-                bounds[index] = {
-                    top: $(element).offset().top + window.screenY,
-                    bottom: $(element).offset().top + window.screenY + $(element).height(),
-                    left: $(element).offset().left + window.screenX,
-                    right: $(element).offset().left + window.screenX + $(element).width()
-                }
-                $(element).siblings(".speaker").html(index + "");
-            })
-            setInterval(function() {
-                $.ajax({
-                    type: "POST",
-                    url: "/latest_gaze_coords",
-                    success: function(response) {
-                        let gazeX = response.coords.x;
-                        let gazeY = response.coords.y;
-                        // let turn = 0
-                        // let gazeX = (bounds[turn].left + bounds[turn].right) / 2;
-                        // let gazeY = (bounds[turn].top + bounds[turn].bottom) / 2;
-                        let closestTurnIdx = closestTurn(bounds, gazeX, gazeY);
-                        $("div.utterance").each((index, element) => {
-                            if (index == closestTurnIdx) {
-                                $(element).css("background-color", "yellow");
-                            } else {
-                                $(element).css("background-color", "white");
-                            }
-                        })
-                        let data = {
-                                "closestTurn": closestTurnIdx,
-                                "timestamp": new Date().getTime()
-                            }
-                            // console.log(data)
-                        $.ajax({
-                            type: "POST",
-                            url: "/telemetry",
-                            data: data,
-                            success: function(response) {
-                                // console.log(response)
-                            }
-                        })
-                    }
-                })
-            }, 15)
-        })
-    </script>
-
-    <title>Annotate Dialogues</title>
 </head>
 
 <body>
-    <nav class="navbar navbar-light bg-light">
-        <span class="navbar-brand mb-0 h1">Annotate Dialogue</span>
-    </nav>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-8">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="dialogue">
-                            <table>
-                                {% for turn in dialogue.turns %}
-                                <tr>
-                                    <td class="left-td">
-                                        {% if turn.speaker == "system" %}
-                                        <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
-                                        <div id="turn-{{loop.index0}}" class="utterance utterance-{{turn.speaker}}">{{ turn.text }}
-                                        </div>
-                                        {% endif %}
-                                    </td>
-                                    <td class="right-td">
-                                        {% if turn.speaker == "user" %}
-                                        <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
-                                        <div id="turn-{{loop.index0}}" class="utterance utterance-{{turn.speaker}}">{{ turn.text }}
-                                        </div>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2"></div>
-            <div class="col-md-2" style="margin-right: 29px; float: right;">
-                <form>
-                    {% for slot in slots %}
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="{{ slot.slot_name }}">
-                    </div>
-                    {% endfor %}
-                    <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="container">
+        <div class="col-md-4">
+            <h2>Welcome to the study!</h2>
+            <div class="form-group">
+                <form class="form" method="post">
+                    <label for="name">Enter your name:</label>
+                    <input class="form-control" type="text" id="name" name="name" required /><br />
+                    <label for="email">Enter your email address:</label>
+                    <input class="form-control" type="email" id="email" name="email_address" required /> <br />
+                    <button class="btn btn-primary form-control" type="submit">Submit</button>
                 </form>
             </div>
         </div>
