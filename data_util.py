@@ -4,7 +4,7 @@ from typing import List, Text, Dict
 from dataclasses import dataclass
 
 
-MULTIWOZ_DOMAINS = ["hospital", "police", "hotel", "restaurant"]
+MULTIWOZ_DOMAINS = ["hospital", "hotel", "restaurant"]
 STAR_DOMAINS = ["apartment", "bank", "hotel", "movie", "plane", "ride"]
 
 
