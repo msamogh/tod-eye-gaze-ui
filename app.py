@@ -14,7 +14,12 @@ from data_util import (
     load_multiwoz_ontology,
     load_star_ontology,
 )
-from constants import NAME_EMAIL_FOLDER, GAZE_PATH_FOLDER
+from constants import (
+    NAME_EMAIL_FOLDER,
+    GAZE_PATH_FOLDER,
+    MULTIWOZ_PRETTY_SLOTS,
+    STAR_PRETTY_SLOTS,
+)
 
 
 DIALOGUE_IDX_KEY = "DIALOGUE_IDX"
@@ -67,6 +72,8 @@ def activity():
     pprint(dialogue)
     return render_template(
         "activity.html",
+        MULTIWOZ_PRETTY_SLOTS=MULTIWOZ_PRETTY_SLOTS,
+        STAR_PRETTY_SLOTS=STAR_PRETTY_SLOTS,
         dialogue=dialogue,
         slots=ONTOLOGIES[dialogue.dataset][dialogue.domain],
     )

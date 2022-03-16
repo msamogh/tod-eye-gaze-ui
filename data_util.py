@@ -7,9 +7,12 @@ from dataclasses import dataclass
 MULTIWOZ_DOMAINS = ["hospital", "hotel", "restaurant"]
 STAR_DOMAINS = ["apartment", "bank", "hotel", "movie", "plane", "ride"]
 
+PRETTY_SLOT_NAMES = {}
+
 
 @dataclass
 class Dialogue:
+    id_: Text
     dataset: Text
     domain: Text
     turns: List["Utterance"]
@@ -35,9 +38,8 @@ class Slot:
 
 def load_multiwoz() -> List[Dialogue]:
     logs = json.load(open("datasets/MULTIWOZ2.4/MULTIWOZ2.4/data.json", "r"))
-    logs = list(logs.values())
     dialogues = []
-    for log in logs:
+    for id_, log in logs.items():
         # System utterances have the "police" key. So I'm using that as a proxy to determine
         # whether the turn is a system turn or not.
         turns = [
@@ -62,7 +64,9 @@ def load_multiwoz() -> List[Dialogue]:
             and dialogue_domain in MULTIWOZ_DOMAINS
         ):
             dialogues.append(
-                Dialogue(dataset="MULTIWOZ", domain=dialogue_domain, turns=turns)
+                Dialogue(
+                    id_=id_, dataset="MULTIWOZ", domain=dialogue_domain, turns=turns
+                )
             )
     return dialogues
 
@@ -90,7 +94,12 @@ def load_star() -> List[Dialogue]:
                 and dialogue_domains[0] in STAR_DOMAINS
             ):
                 dialogues.append(
-                    Dialogue(dataset="STAR", domain=dialogue_domains[0], turns=turns)
+                    Dialogue(
+                        id_=log["DialogueID"],
+                        dataset="STAR",
+                        domain=dialogue_domains[0],
+                        turns=turns,
+                    )
                 )
     return dialogues
 

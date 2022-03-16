@@ -146,15 +146,15 @@
 
             $("#submit").click(function() {
                 let data = {
-                    "utterance": $("#utterance").val(),
+                    "turnsTimeSeries": turnsTimeSeries,
                     "timestamp": new Date().getTime()
                 }
                 $.ajax({
                     type: "POST",
-                    url: "/utterance",
+                    url: "/submit",
                     data: data,
                     success: function(response) {
-                        // console.log(response)
+                        location.reload()
                     }
                 })
             })
@@ -203,7 +203,7 @@
                 <form>
                     {% for slot in slots %}
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="{{ slot.slot_name }}">
+                        <input type="text" class="form-control" placeholder="{{ MULTIWOZ_PRETTY_SLOTS.get(slot.domain, {}).get(slot.slot_name, slot.slot_name) if slot.dataset == 'MULTIWOZ' else STAR_PRETTY_SLOTS.get(slot.domain, {}).get(slot.slot_name, slot.slot_name) }}" />
                     </div>
                     {% endfor %}
                     <button id="submit" type="submit" class="btn btn-primary">Submit</button>
