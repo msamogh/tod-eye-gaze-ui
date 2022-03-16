@@ -22,6 +22,7 @@
             border: 2px solid red;
             margin-top: 10px;
             margin-bottom: 10px;
+            padding: 3px;
         }
         
         body {
@@ -74,12 +75,21 @@
             margin-bottom: 30px;
         }
         
+        select {
+            width: 220px;
+        }
+        
         nav {
             background-color: antiquewhite;
             position: fixed !important;
             top: 0;
             z-index: 9999;
             width: 100%;
+        }
+        
+        #dst-form {
+            position: fixed !important;
+            margin-top: 10px;
         }
         
         .slot-label {
@@ -97,32 +107,29 @@
 
     <script>
         const bounds = {}
-        const turnsTimeSeries = []
+        const turnsTimeSeries = {}
 
         const closestTurn = (bounds, gazeX, gazeY) => {
             let closest = null;
             let closestDist = null;
             for (const [i, bound] of Object.entries(bounds)) {
                 const dist = Math.hypot(gazeX - (bound.left + bound.right) / 2, gazeY - (bound.top + bound.bottom) / 2);
-                // console.log("Distance with " + i + " is " + dist)
                 if (closestDist == null || dist < closestDist) {
                     closest = i;
                     closestDist = dist;
                 }
             }
-            // console.log("closest turn: " + closest + "; least distance: " + closestDist)
             return closest;
         }
 
         $(document).ready(function() {
             $("div.utterance").each((index, element) => {
                 bounds[index] = {
-                        top: $(element).offset().top + window.screenY,
-                        bottom: $(element).offset().top + window.screenY + $(element).height(),
-                        left: $(element).offset().left + window.screenX,
-                        right: $(element).offset().left + window.screenX + $(element).width()
-                    }
-                    // $(element).siblings(".speaker").html(index + "");
+                    top: $(element).offset().top + window.screenY,
+                    bottom: $(element).offset().top + window.screenY + $(element).height(),
+                    left: $(element).offset().left + window.screenX,
+                    right: $(element).offset().left + window.screenX + $(element).width()
+                }
             })
             setInterval(function() {
                 $.ajax({
@@ -131,14 +138,8 @@
                     success: function(response) {
                         let gazeX = response.coords.x;
                         let gazeY = response.coords.y;
-                        // let turn = 0
-                        // let gazeX = (bounds[turn].left + bounds[turn].right) / 2;
-                        // let gazeY = (bounds[turn].top + bounds[turn].bottom) / 2;
                         let closestTurnIdx = closestTurn(bounds, gazeX, gazeY);
-                        turnsTimeSeries.push({
-                            turn: closestTurnIdx,
-                            time: new Date().getTime(),
-                        });
+                        turnsTimeSeries[new Date().getTime()] = closestTurnIdx
 
                         $("div.utterance").each((index, element) => {
                             if (index == closestTurnIdx) {
@@ -148,33 +149,27 @@
                             }
                         })
                         let data = {
-                                "closestTurn": closestTurnIdx,
-                                "timestamp": new Date().getTime()
-                            }
-                            // console.log(data)
-                            // $.ajax({
-                            //     type: "POST",
-                            //     url: "/telemetry",
-                            //     data: data,
-                            //     success: function(response) {
-                            //         // console.log(response)
-                            //     }
-                            // })
+                            "closestTurn": closestTurnIdx,
+                            "timestamp": new Date().getTime()
+                        }
                     }
                 })
             }, 100)
 
             $("#submit").click(function(e) {
                 e.preventDefault()
+                const dstFormData = Object.fromEntries(new FormData(document.getElementById("dst-form")))
                 let data = {
                     "turnsTimeSeries": turnsTimeSeries,
-                    "timestamp": new Date().getTime()
+                    "timestamp": new Date().getTime(),
+                    "dst": dstFormData
                 }
                 $.ajax({
                     type: "POST",
                     url: "/submit",
-                    data: data,
+                    data: JSON.stringify(data),
                     success: function(response) {
+                        console.log("Done")
                         location.reload()
                     }
                 })
@@ -233,13 +228,19 @@
             </div>
             <div class="col-md-2"></div>
             <div class="col-md-2" style="margin-right: 29px; float: right;">
-                <form>
+                <form id="dst-form">
                     {% for slot in slots %}
                     <div class="form-group">
-                        <label class="slot-label" for="{{ slot.slot_name }} ">
+                        <label style="display: block" class="slot-label" for="{{ slot.slot_name }} ">
                             {{ MULTIWOZ_PRETTY_SLOTS.get(slot.domain, {}).get(slot.slot_name, slot.slot_name) if slot.dataset == 'MULTIWOZ' else STAR_PRETTY_SLOTS.get(slot.domain, {}).get(slot.slot_name, slot.slot_name) }}
-                        </label>
-                        <input id="{{ slot.slot_name }} " name="{{ slot.slot_name }} " type="text " class="form-control " placeholder="No particular preference" />
+                        </label> {% if slot.possible_values is none %}
+                        <input id="{{ slot.slot_name }} " name="{{ slot.slot_name }} " type="text " class="form-control " placeholder="No preference specified" /> {% else %}
+                        <select name="{{ slot.slot_name }}" class="custom-select" id="{{ slot.slot_name }}">
+                                <option value="none" selected>No preference specified</option>
+                                {% for option in slot.possible_values %}
+                                    <option value="{{option}}">{{ option }}</option>
+                                {% endfor %}
+                            </select> {% endif %}
                     </div>
                     {% endfor %}
                     <button id="submit" type="submit" class="btn btn-primary">Submit</button>

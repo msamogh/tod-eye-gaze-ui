@@ -9,7 +9,7 @@ MULTIWOZ_PRETTY_SLOTS = {
         "book stay": "Duration of stay",
         "internet": "Availability of internet",
         "name" : "Name of the hotel",
-        "parking": "Avaliability of Parking",
+        "parking": "Availability of Parking",
         "pricerange": "Price Range of the hotel",
         "stars": "Hotel Star Rating",
         "type": "Type of Hotel"

@@ -165,10 +165,10 @@ def latest_gaze_coords():
 
 @app.route("/submit", methods=["POST"])
 def telemetry():
-    data = json.loads(request.data)
+    data = request.form
     if not os.path.exists(GAZE_PATH_FOLDER):
         os.mkdir(GAZE_PATH_FOLDER)
-    with open(f"{session['session_id']}/{GAZE_PATH_FOLDER}/{time}.json", "w") as f:
+    with open(f"{GAZE_PATH_FOLDER}/{time.time()}.json", "w") as f:
         json.dump(data, f)
     return "success"
 
