@@ -1,0 +1,42 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Consent</title>
+    <!-- Add JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script>
+        $(document).ready(function() {
+            $("#agree").click(function() {
+                alert("Alright, let's get started!");
+                window.location.href = "/home";
+            });
+            $("#disagree").click(function() {
+                alert("Thank you for your interest in this study!");
+                window.top.close();
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row" id="bottom">
+            <div class="col-md-12">
+                <h1>Consent</h1>
+                <iframe src="{{ url_for('static', filename='IRB Consent Form.pdf') }}" width="100%" height="800px"></iframe>
+            </div>
+        </div>
+        <div class="row" id="fixed">
+            <div class="col-md-12">
+                <button id="agree" class="btn btn-primary">I agree to participate</button>
+                <button id="disagree" class="btn btn-danger">I do not wish to participate</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
