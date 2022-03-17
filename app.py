@@ -48,12 +48,14 @@ def next_dialogue() -> Dialogue:
     return dialogue
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/home", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         # Save the form data to the session object
+        print(request.form)
         session["email"] = request.form["email_address"]
         session["name"] = request.form["name"]
+        session["calibration_score"] = request.form["calibration_score"]
         try:
             if not os.path.exists(NAME_EMAIL_FOLDER):
                 os.mkdir(NAME_EMAIL_FOLDER)
@@ -65,18 +67,24 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/")
+def consent():
+    return render_template("consent.html")
+
+
 @app.route("/activity")
 def activity():
     if "email" not in session:
         return redirect("/")
     dialogue = next_dialogue()
-    pprint(dialogue)
+    # pprint(dialogue)
     return render_template(
         "activity.html",
         MULTIWOZ_PRETTY_SLOTS=MULTIWOZ_PRETTY_SLOTS,
         STAR_PRETTY_SLOTS=STAR_PRETTY_SLOTS,
         dialogue=dialogue,
         slots=ONTOLOGIES[dialogue.dataset][dialogue.domain],
+        dialogue_idx=session[DIALOGUE_IDX_KEY]
     )
 
 
