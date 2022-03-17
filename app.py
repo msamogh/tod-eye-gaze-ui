@@ -88,6 +88,12 @@ def activity():
     )
 
 
+@app.route("/sign_out")
+def sign_out():
+    session.clear()
+    return redirect("/")
+
+
 def get_last_line(path):
     with open(path, "rb") as f:
         try:  # catch OSError in case of a one line file
