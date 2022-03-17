@@ -73,7 +73,19 @@
         nav {
             background-color: antiquewhite;
         }
+        
+        .slot-label {
+            color: black;
+        }
     </style>
+
+    {% if dialogue_idx == 0 %}
+    <style>
+        .focused-turn {
+            background-color: yellow;
+        }
+    </style>
+    {% endif %}
 
     <script>
         const bounds = {}
@@ -122,9 +134,9 @@
 
                         $("div.utterance").each((index, element) => {
                             if (index == closestTurnIdx) {
-                                $(element).css("background-color", "yellow");
+                                $(element).addClass("focused-turn");
                             } else {
-                                $(element).css("background-color", "white");
+                                $(element).removeClass("focused-turn");
                             }
                         })
                         let data = {
@@ -144,7 +156,8 @@
                 })
             }, 100)
 
-            $("#submit").click(function() {
+            $("#submit").click(function(e) {
+                e.preventDefault()
                 let data = {
                     "turnsTimeSeries": turnsTimeSeries,
                     "timestamp": new Date().getTime()
@@ -158,6 +171,11 @@
                     }
                 })
             })
+
+            $("#sign-out").click(function(e) {
+                e.preventDefault()
+                window.location = "/sign_out"
+            })
         })
     </script>
 
@@ -165,8 +183,15 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-light bg-light">
-        <span class="navbar-brand mb-0 h1">Annotate Dialogue</span>
+
+
+    <nav class="navbar navbar-light bg-light justify-content-between d-lg-flex align-items-center">
+        <a class="navbar-brand">Annotate Dialogue</a>
+        <div class="align-middle" style="font-size: 14pt; margin-top: 10px; text-align: center;">
+            {{ dialogue_idx }} / 15
+
+            <button id="sign-out" style="float: right; " class="btn-warning align-middle btn btn-outline-success my-2 my-sm-0" type="submit">Sign Out</button>
+        </div>
     </nav>
     <div class="container-fluid">
         <div class="row">
@@ -203,7 +228,10 @@
                 <form>
                     {% for slot in slots %}
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="{{ MULTIWOZ_PRETTY_SLOTS.get(slot.domain, {}).get(slot.slot_name, slot.slot_name) if slot.dataset == 'MULTIWOZ' else STAR_PRETTY_SLOTS.get(slot.domain, {}).get(slot.slot_name, slot.slot_name) }}" />
+                        <label class="slot-label" for="{{ slot.slot_name }} ">
+                            {{ MULTIWOZ_PRETTY_SLOTS.get(slot.domain, {}).get(slot.slot_name, slot.slot_name) if slot.dataset == 'MULTIWOZ' else STAR_PRETTY_SLOTS.get(slot.domain, {}).get(slot.slot_name, slot.slot_name) }}
+                        </label>
+                        <input id="{{ slot.slot_name }} " name="{{ slot.slot_name }} " type="text " class="form-control " placeholder="dontcare " />
                     </div>
                     {% endfor %}
                     <button id="submit" type="submit" class="btn btn-primary">Submit</button>
