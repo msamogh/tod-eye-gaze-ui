@@ -56,6 +56,7 @@ def index():
         session["email"] = request.form["email_address"]
         session["name"] = request.form["name"]
         session["calibration_score"] = request.form["calibration_score"]
+        session["session_id"] = f"{int(time.time())}"
         try:
             if not os.path.exists(NAME_EMAIL_FOLDER):
                 os.mkdir(NAME_EMAIL_FOLDER)
@@ -153,10 +154,8 @@ def latest_gaze_coords():
                 if line.strip() == "":
                     continue
                 line = json.loads(line)
-                # print(line)
                 if line["category"] == "tracker":
                     response = {"coords": line["values"]["frame"]["avg"]}
-                    # print(response)
                     return jsonify(response)
         except Exception as e:
             print(e)
@@ -169,7 +168,7 @@ def telemetry():
     data = json.loads(request.data)
     if not os.path.exists(GAZE_PATH_FOLDER):
         os.mkdir(GAZE_PATH_FOLDER)
-    with open(f"{GAZE_PATH_FOLDER}/{time}.json", "w") as f:
+    with open(f"{session['session_id']}/{GAZE_PATH_FOLDER}/{time}.json", "w") as f:
         json.dump(data, f)
     return "success"
 

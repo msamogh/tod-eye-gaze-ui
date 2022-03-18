@@ -24,6 +24,10 @@
             margin-bottom: 10px;
         }
         
+        body {
+            margin-top: 65px;
+        }
+        
         .speaker {
             font-weight: bold;
         }
@@ -72,6 +76,10 @@
         
         nav {
             background-color: antiquewhite;
+            position: fixed !important;
+            top: 0;
+            z-index: 9999;
+            width: 100%;
         }
         
         .slot-label {
@@ -79,7 +87,7 @@
         }
     </style>
 
-    {% if dialogue_idx == 0 %}
+    {% if dialogue_idx == 1 %}
     <style>
         .focused-turn {
             background-color: yellow;
@@ -204,14 +212,14 @@
                                 <tr>
                                     <td class="left-td">
                                         {% if turn.speaker == "system" %}
-                                        <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }} ({{ loop.index0 }})</div>
+                                        <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
                                         <div id="turn-{{loop.index0}}" class="utterance utterance-{{turn.speaker}}">{{ turn.text }}
                                         </div>
                                         {% endif %}
                                     </td>
                                     <td class="right-td">
                                         {% if turn.speaker == "user" %}
-                                        <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }} ({{ loop.index0 }})</div>
+                                        <div class="speaker speaker-{{turn.speaker}}">{{ turn.speaker.title() }}</div>
                                         <div id="turn-{{loop.index0}}" class="utterance utterance-{{turn.speaker}}">{{ turn.text }}
                                         </div>
                                         {% endif %}
@@ -231,7 +239,7 @@
                         <label class="slot-label" for="{{ slot.slot_name }} ">
                             {{ MULTIWOZ_PRETTY_SLOTS.get(slot.domain, {}).get(slot.slot_name, slot.slot_name) if slot.dataset == 'MULTIWOZ' else STAR_PRETTY_SLOTS.get(slot.domain, {}).get(slot.slot_name, slot.slot_name) }}
                         </label>
-                        <input id="{{ slot.slot_name }} " name="{{ slot.slot_name }} " type="text " class="form-control " placeholder="dontcare " />
+                        <input id="{{ slot.slot_name }} " name="{{ slot.slot_name }} " type="text " class="form-control " placeholder="No particular preference" />
                     </div>
                     {% endfor %}
                     <button id="submit" type="submit" class="btn btn-primary">Submit</button>
