@@ -168,7 +168,9 @@ def telemetry():
     data = request.form
     if not os.path.exists(GAZE_PATH_FOLDER):
         os.mkdir(GAZE_PATH_FOLDER)
-    with open(f"{GAZE_PATH_FOLDER}/{time.time()}.json", "w") as f:
+    if not os.path.exists(f"{GAZE_PATH_FOLDER}/{session['email']}"):
+        os.mkdir(f"{GAZE_PATH_FOLDER}/{session['email']}")
+    with open(f"{GAZE_PATH_FOLDER}/{session['email']}/{time.time()}.json", "w") as f:
         json.dump(data, f)
     return "success"
 
