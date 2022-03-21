@@ -105,7 +105,7 @@
             padding: 5px;
             font-weight: bold;
             color: green;
-            font-size: 16px;
+            font-size: 15px;
             width: 90%;
             border-bottom: 2px solid green;
             /* position: fixed; */
@@ -177,8 +177,10 @@
                 let data = {
                     "turnsTimeSeries": turnsTimeSeries,
                     "timestamp": new Date().getTime(),
-                    "dst": dstFormData
+                    "dst": dstFormData,
+                    "prompt": "{{ prompt }}"
                 }
+                console.log(data)
                 $.ajax({
                     type: "POST",
                     url: "/submit",
@@ -232,8 +234,6 @@
 </head>
 
 <body>
-
-
     <nav class="navbar navbar-light bg-light justify-content-between d-lg-flex align-items-center">
         <a class="navbar-brand">Annotate Dialogue</a>
         <div class="align-middle" style="font-size: 14pt; margin-top: 10px; text-align: center;">
