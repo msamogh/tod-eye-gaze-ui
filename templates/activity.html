@@ -276,7 +276,7 @@
             <div class="col-md-3" style="margin-right: -30px; float: right;">
                 <form id="dst-form">
                     <p class="instruction">
-                        {% if prompt == "goal" %} What does the user want? {% elif prompt == "semi" %} What did the user finally end up booking (regardless of what they initially had in mind)? {% endif %}
+                        Based on the latest user response, answer the following question. {% if prompt == "goal" %} What does the user want? {% elif prompt == "semi" %} What did the user finally end up booking (regardless of what they initially had in mind)? {% endif %}
                     </p>
                     {% for slot in slots %}
                     <div class="form-group">

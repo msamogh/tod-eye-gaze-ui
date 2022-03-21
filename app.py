@@ -18,7 +18,8 @@ from data_util import (
 from constants import (
     NAME_EMAIL_FOLDER,
     GAZE_PATH_FOLDER,
-    MULTIWOZ_PRETTY_SLOTS,
+    MULTIWOZ_PRETTY_SLOTS_GOAL,
+    MULTIWOZ_PRETTY_SLOTS_SEMI,
     STAR_PRETTY_SLOTS,
 )
 
@@ -60,6 +61,8 @@ def index():
         session["name"] = request.form["name"]
         session["calibration_score"] = request.form["calibration_score"]
         session["session_id"] = f"{int(time.time())}"
+        session["first_prompt"] = random.choice([PROMPT_GOAL, PROMPT_SEMI])
+        session["second_prompt"] = PROMPT_GOAL if session["first_prompt"] == PROMPT_SEMI else PROMPT_SEMI
         try:
             if not os.path.exists(NAME_EMAIL_FOLDER):
                 os.mkdir(NAME_EMAIL_FOLDER)
@@ -76,19 +79,27 @@ def consent():
     return render_template("consent.html")
 
 
+def first_prompt():
+    if session["first_prompt_goal"]:
+        return PROMPT_GOAL
+    else:
+        return PROMPT_SEMI
+
+
 @app.route("/activity")
 def activity():
     if "email" not in session:
         return redirect("/")
     dialogue = next_dialogue()
+    prompt = session["first_prompt"] if (session[DIALOGUE_IDX_KEY] - 1) <= 10 else session["second_prompt"]
     return render_template(
         "activity.html",
-        MULTIWOZ_PRETTY_SLOTS=MULTIWOZ_PRETTY_SLOTS,
+        MULTIWOZ_PRETTY_SLOTS=MULTIWOZ_PRETTY_SLOTS_GOAL if prompt == "goal" else MULTIWOZ_PRETTY_SLOTS_SEMI,
         STAR_PRETTY_SLOTS=STAR_PRETTY_SLOTS,
         dialogue=dialogue,
         slots=ONTOLOGIES[dialogue.dataset][dialogue.domain],
         dialogue_idx=session[DIALOGUE_IDX_KEY] - 1,
-        prompt=PROMPT_GOAL if (session[DIALOGUE_IDX_KEY] - 1) <= 10 else PROMPT_SEMI,
+        prompt=prompt,
     )
 
 
@@ -169,7 +180,6 @@ def latest_gaze_coords():
 @app.route("/submit", methods=["POST"])
 def telemetry():
     data = json.loads(request.get_data())
-    print(data)
     if not os.path.exists(GAZE_PATH_FOLDER):
         os.mkdir(GAZE_PATH_FOLDER)
     if not os.path.exists(f"{GAZE_PATH_FOLDER}/{session['email']}"):
