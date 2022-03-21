@@ -40,7 +40,7 @@ def next_dialogue() -> Dialogue:
     if not session.get(DIALOGUE_IDX_KEY):
         session[DIALOGUE_IDX_KEY] = 0
     # Randomly decide between MultiWOZ and STAR
-    if random.random() < 0.5:
+    if True or random.random() < 0.5:
         dialogue = random.choice(MULTIWOZ)
     else:
         dialogue = random.choice(STAR)
