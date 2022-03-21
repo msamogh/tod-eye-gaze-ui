@@ -32,9 +32,10 @@ MULTIWOZ_PRETTY_SLOTS = {
         "type": "Is the user looking for an attraction by Type?"
     },
     "taxi" : {
-        "color" : "What color of taxi does the user want?",
-        "type" : "What type of taxi does the user want?",
-        "phone": "Phone number of the taxi booked by the user?"
+        "arriveBy" : "What time does the user want the taxi to arrive?",
+        "departure" : "From where should the taxi depart?",
+        "destination": "What should be the taxi destination?",
+        "leaveAt" : "What time does the user want the taxi to leave?"
     }
 
 }
