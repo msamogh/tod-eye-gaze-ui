@@ -3,34 +3,41 @@ GAZE_PATH_FOLDER = "gaze-paths"
 
 MULTIWOZ_PRETTY_SLOTS = {
     "hotel": {
-        "area": "Direction of location",
-        "book day": "Day of Booking",
-        "book people": "Number of people to book for",
-        "book stay": "Duration of stay",
-        "internet": "Availability of internet",
-        "name" : "Name of the hotel",
-        "parking": "Availability of Parking",
-        "pricerange": "Price Range of the hotel",
-        "stars": "Hotel Star Rating",
-        "type": "Type of Hotel"
+        "area": "What is the area the user wants?",
+        "book day": "Which day does the user want the booking?",
+        "book people": "How many people the user wants the booking for?",
+        "book stay": "What is the duration of user's stay?",
+        "internet": "Does the user need internet?",
+        "name" : "Is the user looking for a hotel by Name?",
+        "parking": "Does the user want parking available?",
+        "pricerange": "What is the price range the user wants?",
+        "stars": "What star rating of the ho",
+        "type": "What is the hotel type the user wants?"
     },
     "hospital": {
-        "department": "Name of the department"
+        "department": "What department does the user want?"
     },
     "restaurant": {
-        "area": "Direction of the location of the restaurant",
-        "book day": "Day of restaurant booking",
-        "book people" : "Number of people to book the restaurant",
-        "book time": "Time of booking of the restaurant",
-        "food": "Food cuisine of the restaurant",
-        "name": "Name of the restaurant",
-        "pricerange": "Range of price of the restaurant"
+        "area": "What area does the user want?",
+        "book day": "Which day does the user want the booking?",
+        "book people" : "How many people the user wants the booking for?",
+        "book time": "What time does the user want to book?",
+        "food": "What food cuisine does the user want?",
+        "name": "Is the user looking for a restaurant by Name?",
+        "pricerange": "What is the price range the user wants?"
     },
     "attraction": {
-        "area": "Direction of location of the attraction",
-        "name": "Name of the attraction",
-        "type": "Type of the attraction"
+        "area": "What area does the user want?",
+        "name": "Is the user looking for an attraction by Name?",
+        "type": "Is the user looking for an attraction by Type?"
+    },
+    "taxi" : {
+        "arriveBy" : "What time does the user want the taxi to arrive?",
+        "departure" : "From where should the taxi depart?",
+        "destination": "What should be the taxi destination?",
+        "leaveAt" : "What time does the user want the taxi to leave?"
     }
+
 }
 
 STAR_PRETTY_SLOTS = {
@@ -71,8 +78,8 @@ STAR_PRETTY_SLOTS = {
     "plane": {
         "DepartureCity": "Departure city of the plane",
         "ArrivalCity": "Arrival city of the plane",
-        "Price": "Price of travel on the plane",
-        "Date": "Data of travel on the plane",
+        "Price": "What is the ticket price?",
+        "Date": "Date of travel on the plane",
         "ArrivalTime": "Time of arrival of the plane",
         "Class": "Class of travel on the plane",
         "DurationHours": "Duration of travel on plane in hours",
@@ -80,13 +87,13 @@ STAR_PRETTY_SLOTS = {
         "Name": "Plane number"
     },
     "ride": {
-        "Price": "Price of the ride",
+        "Price": "How much will the ride cost the user?",
         "AllowsChanges": "Are ride changes allowed?",
-        "MinutesTillPickup": "Ride pickup in minutes",
+        "MinutesTillPickup": "How many minutes until ride pick up?",
         "ServiceProvider": "Ride service provider",
-        "DriverName": "Driver name of the ride",
-        "CarModel": "Car model of the ride",
-        "LicensePlate": "License plate number of the ride",
+        "DriverName": "What is Driver's name?",
+        "CarModel": "What is the car model?",
+        "LicensePlate": "License plate number of the car booked",
         "id": "Ride number"
     }
 }
