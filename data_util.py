@@ -4,7 +4,7 @@ from typing import List, Text, Dict
 from dataclasses import dataclass
 
 
-MULTIWOZ_DOMAINS = ["hospital", "hotel", "restaurant", "taxi"]
+MULTIWOZ_DOMAINS = ["hotel", "restaurant", "taxi"]
 STAR_DOMAINS = ["apartment", "bank", "hotel", "movie", "plane", "ride"]
 
 PRETTY_SLOT_NAMES = {}
@@ -53,9 +53,12 @@ def load_multiwoz() -> List[Dialogue]:
         dialogue_domain = None
         dialogue_domains_count = 0
         for domain, goal in log["goal"].items():
+            if domain in ["topic", "message"]:
+                continue
             if goal:
                 dialogue_domains_count += 1
                 dialogue_domain = domain
+            if dialogue_domains_count > 1:
                 break
 
         if (

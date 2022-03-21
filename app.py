@@ -31,6 +31,9 @@ STAR = load_star()
 
 ONTOLOGIES = {"STAR": load_star_ontology(), "MULTIWOZ": load_multiwoz_ontology()}
 
+PROMPT_GOAL = "goal"
+PROMPT_SEMI = "semi"
+
 
 app = Flask(__name__)
 app.secret_key = "TERRRIGDENOINDEdfnfw3"
@@ -78,14 +81,14 @@ def activity():
     if "email" not in session:
         return redirect("/")
     dialogue = next_dialogue()
-    # pprint(dialogue)
     return render_template(
         "activity.html",
         MULTIWOZ_PRETTY_SLOTS=MULTIWOZ_PRETTY_SLOTS,
         STAR_PRETTY_SLOTS=STAR_PRETTY_SLOTS,
         dialogue=dialogue,
         slots=ONTOLOGIES[dialogue.dataset][dialogue.domain],
-        dialogue_idx=session[DIALOGUE_IDX_KEY]
+        dialogue_idx=session[DIALOGUE_IDX_KEY] - 1,
+        prompt=PROMPT_GOAL if (session[DIALOGUE_IDX_KEY] - 1) <= 10 else PROMPT_SEMI,
     )
 
 
@@ -165,7 +168,8 @@ def latest_gaze_coords():
 
 @app.route("/submit", methods=["POST"])
 def telemetry():
-    data = request.form
+    data = json.loads(request.get_data())
+    print(data)
     if not os.path.exists(GAZE_PATH_FOLDER):
         os.mkdir(GAZE_PATH_FOLDER)
     if not os.path.exists(f"{GAZE_PATH_FOLDER}/{session['email']}"):
