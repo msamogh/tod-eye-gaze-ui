@@ -4,7 +4,7 @@ import click
 
 
 with open("../../datasets/MULTIWOZ2.4/MULTIWOZ2.4/data.json", "r") as f:
-    data = json.load(f) 
+    data = json.load(f)
 
 
 def main():
@@ -35,5 +35,6 @@ def main():
             continue
         print(candidates)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
